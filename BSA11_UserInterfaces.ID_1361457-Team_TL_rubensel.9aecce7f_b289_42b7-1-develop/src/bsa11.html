@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ex.05 — Экранные формы (wireframe) | Запись на стрижку</title>
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --surface2: #252525;
+      --border: #3d3428;
+      --accent: #c9a227;
+      --accent-dim: #8b7519;
+      --text: #e8e4dc;
+      --text-muted: #9a958c;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    .page-header {
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+      border-bottom: 2px solid var(--accent);
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+    .page-header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+    }
+    .page-header p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.35rem;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      padding: 1rem 2rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .tabs button {
+      font-family: var(--font);
+      font-size: 0.95rem;
+      padding: 0.6rem 1.4rem;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .tabs button:first-of-type { border-radius: 6px 0 0 6px; }
+    .tabs button:last-of-type { border-radius: 0 6px 6px 0; }
+    .tabs button:hover { color: var(--text); border-color: var(--accent-dim); }
+    .tabs button.active {
+      background: var(--accent-dim);
+      color: var(--text);
+      border-color: var(--accent);
+    }
+    .device-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 2rem;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .device-tabs button {
+      font-family: var(--font);
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      background: var(--surface);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .device-tabs button:hover { color: var(--text); border-color: var(--accent-dim); }
+    .device-tabs button.active {
+      background: var(--accent-dim);
+      color: var(--text);
+      border-color: var(--accent);
+    }
+    .device-hint {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      padding: 0.5rem 2rem;
+      background: var(--surface2);
+    }
+    .role-panel {
+      display: none;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .role-panel.active { display: block; }
+    .role-panel h2 {
+      font-size: 1.15rem;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .wireframes {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+      justify-items: center;
+    }
+    /* Рамка устройства — размер через body.device-* */
+    .device-mockup {
+      position: relative;
+      background: #1c1c1c;
+      border-radius: 24px;
+      padding: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.06);
+      width: 304px;
+      margin: 0 auto;
+    }
+    .device-notch {
+      display: none;
+      width: 100px;
+      height: 22px;
+      background: #0a0a0a;
+      border-radius: 0 0 14px 14px;
+      margin: 0 auto 8px;
+    }
+    body.device-phone .device-mockup {
+      width: 304px;
+      border-radius: 28px;
+      padding: 10px;
+    }
+    body.device-phone .device-mockup .device-screen {
+      width: 284px;
+      min-height: 500px;
+      border-radius: 18px;
+    }
+    body.device-phone .device-notch { display: block; }
+    body.device-phone .device-chrome { display: none; }
+    body.device-tablet .device-mockup {
+      width: 420px;
+      border-radius: 20px;
+      padding: 14px;
+    }
+    body.device-tablet .device-mockup .device-screen {
+      width: 392px;
+      min-height: 500px;
+      border-radius: 12px;
+    }
+    body.device-tablet .device-chrome { display: none; }
+    body.device-desktop .device-mockup {
+      width: 100%;
+      max-width: 640px;
+      border-radius: 12px 12px 0 0;
+      padding: 0;
+      border: 1px solid var(--border);
+    }
+    body.device-desktop .device-mockup .device-screen {
+      width: 100%;
+      min-height: 420px;
+      border-radius: 0;
+    }
+    body.device-desktop .device-chrome {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      border-radius: 12px 12px 0 0;
+    }
+    body.device-desktop .device-dots { display: flex; gap: 6px; }
+    body.device-desktop .device-dots span {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    body.device-desktop .device-dots span:nth-child(1) { background: #e74c3c; }
+    body.device-desktop .device-dots span:nth-child(2) { background: #f1c40f; }
+    body.device-desktop .device-dots span:nth-child(3) { background: #2ecc71; }
+    body.device-desktop .device-url {
+      flex: 1;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin: 0 10px;
+    }
+    .device-chrome { display: none; }
+    .device-screen {
+      background: var(--surface);
+      overflow: hidden;
+      margin: 0 auto;
+      position: relative;
+    }
+    .device-label {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+    }
+    body.device-phone .wireframes { grid-template-columns: 1fr; gap: 2.5rem; }
+    body.device-phone .wireframe-card { width: 100%; max-width: 320px; margin: 0 auto; }
+    body.device-tablet .wireframes { grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 2rem; }
+    body.device-tablet .wireframe-card { width: 100%; }
+    body.device-desktop .wireframes { grid-template-columns: repeat(auto-fill, minmax(680px, 1fr)); justify-items: center; gap: 2rem; }
+    .wireframe {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      overflow: hidden;
+      box-shadow: none;
+      height: 100%;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+    }
+    body.device-phone .wireframe,
+    body.device-tablet .wireframe { min-height: 440px; }
+    .wireframe-title {
+      background: var(--surface2);
+      padding: 0.6rem 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+    }
+    body.device-phone .wireframe-title { font-size: 0.75rem; padding: 0.5rem 0.6rem; }
+    body.device-tablet .wireframe-title { font-size: 0.8rem; }
+    .wireframe-id {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-left: 0.5rem;
+    }
+    body.device-phone .wireframe-id { font-size: 0.6rem; }
+    .wireframe-body {
+      padding: 0.9rem;
+      font-size: 0.8rem;
+      flex: 1;
+    }
+    body.device-phone .wireframe-body { padding: 0.5rem 0.6rem; font-size: 0.7rem; }
+    body.device-phone .frame-label { font-size: 0.58rem; }
+    body.device-phone .frame-content { font-size: 0.65rem; }
+    body.device-phone .wireframe-role { font-size: 0.6rem; }
+    body.device-tablet .wireframe-body { font-size: 0.75rem; }
+    .frame-block {
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+      padding: 0.5rem 0.65rem;
+      margin-bottom: 0.6rem;
+      background: rgba(201, 162, 39, 0.06);
+    }
+    .frame-block:last-child { margin-bottom: 0; }
+    .frame-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-dim);
+      margin-bottom: 0.25rem;
+    }
+    .frame-content {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+    .wireframe-role {
+      margin-top: 0.6rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .wireframe-role strong { color: var(--accent-dim); }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body class="device-phone">
+  <header class="page-header">
+    <h1>Ex.05 — Экранные формы (wireframe)</h1>
+  </header>
+
+  <nav class="tabs">
+    <button type="button" class="tab-btn active" data-role="client">Клиент</button>
+    <button type="button" class="tab-btn" data-role="manager">Менеджер</button>
+    <button type="button" class="tab-btn" data-role="master">Мастер</button>
+  </nav>
+
+  <div class="device-tabs">
+    <button type="button" class="device-btn active" data-device="phone">📱 Телефон</button>
+    <button type="button" class="device-btn" data-device="tablet">📱 Планшет</button>
+    <button type="button" class="device-btn" data-device="desktop">🖥️ Десктоп</button>
+  </div>
+  <p class="device-hint">Вид экрана на устройстве пользователя</p>
+
+  <main>
+    <!-- Клиент -->
+    <section id="panel-client" class="role-panel active">
+      <h2>Экранные формы для роли «Клиент»</h2>
+      <div class="wireframes">
+        <div class="wireframe-card">
+          <div class="device-mockup device-phone">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/запись</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Главная онлайн-записи <span class="wireframe-id">MAIN_ONLINE_SIGNUP</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Навигация: Услуги · Мастера · Записаться</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Другие операции</div>
+              <div class="frame-content">Просмотр услуг и мастеров</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм данных (список)</div>
+              <div class="frame-content">Блоки: Услуги, Мастера (кратко)</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Переход к записи → Далее · Отмена — выход</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Клиент (публичный доступ)</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">MAIN_ONLINE_SIGNUP</div>
+          </div>
+        </div>
+
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/запись</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Выбор мастера <span class="wireframe-id">SELECT_MASTER</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Выбор мастера из списка</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Обеспечивающие операции</div>
+              <div class="frame-content">Фильтр по услуге; поиск</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм списка / карточка</div>
+              <div class="frame-content">Список: фото, имя, рейтинг, специализация. Карточка: детали мастера, свободные слоты</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Выбрать мастера → Далее · Назад · Отмена</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Клиент</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">SELECT_MASTER</div>
+          </div>
+        </div>
+
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/запись</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Выбор услуги <span class="wireframe-id">SELECT_SERVICE</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Выбор услуги из перечня</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Обеспечивающие операции</div>
+              <div class="frame-content">Фильтр по мастеру (если выбран)</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм данных</div>
+              <div class="frame-content">Список: название, длительность, стоимость; карточка: описание</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Выбрать услугу → Далее · Назад · Отмена</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Клиент</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">SELECT_SERVICE</div>
+          </div>
+        </div>
+
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/запись</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Выбор даты и времени <span class="wireframe-id">SELECT_DATE_TIME</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Выбор слота (дата + время)</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм данных</div>
+              <div class="frame-content">Сетка/календарь свободных слотов по выбранному мастеру/услуге</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Выбрать слот → Далее · Назад · Отмена</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Клиент</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">SELECT_DATE_TIME</div>
+          </div>
+        </div>
+
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/запись</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Ввод данных клиента <span class="wireframe-id">CLIENT_DATA</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Ввод и подтверждение контактных данных</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм карточки данных</div>
+              <div class="frame-content">Поля: ФИО, телефон, email, канал связи (Telegram/WhatsApp/VK/СМС)</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Подтвердить → Забронировать · Назад · Отмена</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Клиент (ввод личных данных)</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">CLIENT_DATA</div>
+          </div>
+        </div>
+
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/запись</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Подтверждение записи <span class="wireframe-id">APPOINTMENT_CONFIRMED</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Отображение успешного создания записи</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм карточки</div>
+              <div class="frame-content">Детали: мастер, услуга, дата, время, контакты</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Другие операции</div>
+              <div class="frame-content">Просмотр детали, отмена записи</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">На главную · Мои записи · Отменить запись</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Клиент (управление своей записью)</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">APPOINTMENT_CONFIRMED</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Менеджер -->
+    <section id="panel-manager" class="role-panel">
+      <h2>Экранные формы для роли «Менеджер»</h2>
+      <div class="wireframes">
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/менеджер</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Список клиентов <span class="wireframe-id">MNGR_CLIENT_LIST</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Просмотр и управление базой клиентов</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Обеспечивающие операции</div>
+              <div class="frame-content">Сортировка, фильтрация, поиск; новая запись для клиента</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм списка / карточка</div>
+              <div class="frame-content">Список: имя, телефон, история записей. Карточка: детали клиента</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Добавить · Редактировать · Регистрация клиента · Отмена</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Менеджер (полный доступ)</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">MNGR_CLIENT_LIST</div>
+          </div>
+        </div>
+
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/менеджер</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Регистрация клиента <span class="wireframe-id">MNGR_CLIENT_REG</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Ввод и регистрация нового клиента</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм карточки</div>
+              <div class="frame-content">Телефон, имя; проверка уникальности телефона; генерация временного пароля, СМС</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Зарегистрировать → Далее · Отмена</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Менеджер (чтение/запись)</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">MNGR_CLIENT_REG</div>
+          </div>
+        </div>
+
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/менеджер</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Расписание мастеров <span class="wireframe-id">MNGR_SCHED_EDIT</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Управление расписанием работы мастеров</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Другие операции</div>
+              <div class="frame-content">Изменение, удаление слотов; фильтр по дате/мастеру</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм данных</div>
+              <div class="frame-content">Список слотов: дата, время, мастер, статус. Карточка: детали записи</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Добавить слот · Редактировать слот · Удалить · Отмена</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Менеджер (полный доступ)</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">MNGR_SCHED_EDIT</div>
+          </div>
+        </div>
+
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/менеджер</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Добавление слота <span class="wireframe-id">MNGR_ADD_SLOT</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Создание нового слота для записи</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм карточки</div>
+              <div class="frame-content">Выбор даты, слот (время 1 ч), мастер из справочника; проверка, что слот не занят</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Закрепить слот → Сохранить · Отмена</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Менеджер</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">MNGR_ADD_SLOT</div>
+          </div>
+        </div>
+
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/менеджер</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Перенос записи <span class="wireframe-id">MNGR_EDIT_SLOT</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Изменение времени или мастера для уже зарегистрированного слота</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм карточки</div>
+              <div class="frame-content">Данные записи, контакты клиента; новое время/мастер; отправка СМС об изменении</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Сохранить изменения → Уведомить клиента · Отмена</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Менеджер (полный доступ)</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">MNGR_EDIT_SLOT</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Мастер -->
+    <section id="panel-master" class="role-panel">
+      <h2>Экранные формы для роли «Мастер»</h2>
+      <div class="wireframes">
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/мастер</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Главная мастера <span class="wireframe-id">MASTER_HOME</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Главная страница: обзор расписания и записей</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Другие операции</div>
+              <div class="frame-content">Навигация к расписанию, отзывам</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм данных</div>
+              <div class="frame-content">Расписание на сегодня, ближайшие записи, уведомления</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Расписание · Отзывы · Выход</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Мастер (просмотр личных данных)</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">MASTER_HOME</div>
+          </div>
+        </div>
+
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/мастер</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Расписание мастера <span class="wireframe-id">MASTER_SCHED</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Просмотр расписания мастера</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Другие операции</div>
+              <div class="frame-content">Просмотр подробностей записей (клиент, услуга, время)</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм списка / карточка</div>
+              <div class="frame-content">Список слотов; карточка записи: клиент, услуга, контакт</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Назад · Обновить · Фильтр по дате</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Мастер (просмотр своего расписания)</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">MASTER_SCHED</div>
+          </div>
+        </div>
+
+        <div class="wireframe-card">
+          <div class="device-mockup">
+            <div class="device-notch"></div>
+            <div class="device-chrome">
+              <div class="device-dots"><span></span><span></span><span></span></div>
+              <div class="device-url">barbershop.ru/мастер</div>
+            </div>
+            <div class="device-screen">
+        <article class="wireframe">
+          <div class="wireframe-title">Отзывы клиентов <span class="wireframe-id">MASTER_FEEDBACK</span></div>
+          <div class="wireframe-body">
+            <div class="frame-block">
+              <div class="frame-label">Фрейм главной операции</div>
+              <div class="frame-content">Просмотр отзывов и оценок клиентов</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Обеспечивающие операции</div>
+              <div class="frame-content">Сортировка по дате/оценке; фильтр по услуге</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Фрейм списка / карточка</div>
+              <div class="frame-content">Список: дата, клиент, услуга, оценка, текст. Карточка: полный отзыв</div>
+            </div>
+            <div class="frame-block">
+              <div class="frame-label">Вызовы</div>
+              <div class="frame-content">Назад · Обновить</div>
+            </div>
+            <div class="wireframe-role"><strong>Роль:</strong> Мастер (просмотр отзывов)</div>
+          </div>
+        </article>
+            </div>
+            <div class="device-label">MASTER_FEEDBACK</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Ex.05 Wireframe
+  </footer>
+
+  <script>
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var role = this.getAttribute('data-role');
+        document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.role-panel').forEach(function(p) { p.classList.remove('active'); });
+        this.classList.add('active');
+        var panel = document.getElementById('panel-' + role);
+        if (panel) panel.classList.add('active');
+      });
+    });
+    document.querySelectorAll('.device-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var device = this.getAttribute('data-device');
+        document.body.classList.remove('device-phone', 'device-tablet', 'device-desktop');
+        document.body.classList.add('device-' + device);
+        document.querySelectorAll('.device-btn').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
